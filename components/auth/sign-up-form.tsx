@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export function SignUpForm() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,7 +29,21 @@ export function SignUpForm() {
       return;
     }
 
-    router.push("/dashboard");
+    // requireEmailVerification is on, so the user isn't signed in yet —
+    // show a "check your inbox" state instead of redirecting.
+    setSubmittedEmail(email);
+  }
+
+  if (submittedEmail) {
+    return (
+      <div className="flex flex-col gap-2 rounded-md border border-black/10 p-4 text-center dark:border-white/15">
+        <p className="font-medium">Check your inbox</p>
+        <p className="text-sm text-black/60 dark:text-white/60">
+          We sent a verification link to <span className="font-medium">{submittedEmail}</span>.
+          Click it to activate your account.
+        </p>
+      </div>
+    );
   }
 
   return (

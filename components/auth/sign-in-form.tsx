@@ -9,11 +9,15 @@ export function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resent, setResent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setNeedsVerification(false);
+    setResent(false);
     setLoading(true);
 
     const { error } = await authClient.signIn.email({
@@ -24,11 +28,25 @@ export function SignInForm() {
     setLoading(false);
 
     if (error) {
-      setError(error.message ?? "Something went wrong. Please try again.");
+      // Better Auth returns this specific code when requireEmailVerification
+      // is on and the user hasn't clicked the link yet.
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        setNeedsVerification(true);
+      } else {
+        setError(error.message ?? "Something went wrong. Please try again.");
+      }
       return;
     }
 
     router.push("/dashboard");
+  }
+
+  async function handleResend() {
+    await authClient.sendVerificationEmail({
+      email,
+      callbackURL: "/dashboard",
+    });
+    setResent(true);
   }
 
   return (
@@ -64,6 +82,23 @@ export function SignInForm() {
       </div>
 
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+
+      {needsVerification && (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm">
+          <p>Please verify your email before signing in.</p>
+          {resent ? (
+            <p className="mt-1 text-black/60 dark:text-white/60">Verification email sent — check your inbox.</p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResend}
+              className="mt-1 font-medium underline underline-offset-4"
+            >
+              Resend verification email
+            </button>
+          )}
+        </div>
+      )}
 
       <button
         type="submit"
