@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { roleRedirectPath } from "@/lib/role-redirect";
 
 export function SignInForm() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function SignInForm() {
     setResent(false);
     setLoading(true);
 
-    const { error } = await authClient.signIn.email({
+    const { data, error } = await authClient.signIn.email({
       email,
       password,
     });
@@ -38,13 +39,13 @@ export function SignInForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(roleRedirectPath(data.user.role));
   }
 
   async function handleResend() {
     await authClient.sendVerificationEmail({
       email,
-      callbackURL: "/dashboard",
+      callbackURL: "/auth/redirect",
     });
     setResent(true);
   }

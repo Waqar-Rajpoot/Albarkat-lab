@@ -29,6 +29,8 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    // Google sign-in bypasses this since Google already verifies the
+    // email for you. Only email/password sign-ups need this step.
     requireEmailVerification: true,
   },
 

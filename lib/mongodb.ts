@@ -6,6 +6,11 @@ if (!MONGODB_URI) {
   throw new Error("Missing MONGODB_URI environment variable");
 }
 
+/**
+ * Cache the connection across hot reloads in development and across
+ * serverless function invocations so we don't open a new connection
+ * on every request.
+ */
 type MongooseCache = {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;

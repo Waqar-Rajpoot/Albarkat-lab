@@ -10,7 +10,7 @@ export function GoogleButton() {
     setLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/auth/redirect",
     });
     // No need to reset `loading` — a successful call redirects the browser.
   }

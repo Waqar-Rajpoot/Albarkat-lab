@@ -20,6 +20,7 @@ export function SignUpForm() {
       name,
       email,
       password,
+      callbackURL: "/auth/redirect", // where the verification link sends them after clicking it
     });
 
     setLoading(false);
