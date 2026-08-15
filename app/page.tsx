@@ -24,6 +24,9 @@ export default function Home() {
             <a href="#" style={{ color: 'var(--color-text-gray)' }} className="hover:font-semibold transition">
               Services
             </a>
+            <a href="/sign-in" style={{ color: 'var(--color-text-gray)' }} className="hover:font-semibold transition">
+              Sign in
+            </a>
           </nav>
         </div>
       </header>
