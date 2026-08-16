@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import Link from "next/link";
 import {
-  ArrowLeft,
   FlaskConical,
   Loader2,
   Pencil,
@@ -37,9 +35,21 @@ type Test = {
   _id: string;
   testId: number;
   description: string;
+  price: number;
 };
 
-const emptyForm = { testId: "", description: "" };
+const emptyForm = { testId: "", description: "", price: "" };
+
+const priceFormatter = new Intl.NumberFormat("en-PK", {
+  style: "currency",
+  currency: "PKR",
+  maximumFractionDigits: 2,
+});
+
+function formatPrice(price: number) {
+  if (!Number.isFinite(price)) return "—";
+  return priceFormatter.format(price);
+}
 
 export default function AdminTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
@@ -69,15 +79,17 @@ export default function AdminTestsPage() {
   }
 
   useEffect(() => {
-    // Standard fetch-on-mount pattern; loadTests manages its own
-    // loading/error state internally.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadTests();
   }, []);
 
   function startEdit(test: Test) {
     setEditingId(test._id);
-    setForm({ testId: String(test.testId), description: test.description });
+    setForm({
+      testId: String(test.testId),
+      description: test.description,
+      price: Number.isFinite(test.price) ? String(test.price) : "",
+    });
   }
 
   function cancelEdit() {
@@ -99,6 +111,7 @@ export default function AdminTestsPage() {
           body: JSON.stringify({
             testId: Number(form.testId),
             description: form.description,
+            price: Number(form.price),
           }),
         }
       );
@@ -160,7 +173,7 @@ export default function AdminTestsPage() {
             {editingId ? "Edit test" : "Add a new test"}
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
+          <div className="grid gap-4 sm:grid-cols-[140px_1fr_140px]">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="testId">Test ID</Label>
               <Input
@@ -181,6 +194,19 @@ export default function AdminTestsPage() {
                 required
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="price">Price (PKR)</Label>
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="1500"
+                required
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
             </div>
           </div>
@@ -215,21 +241,22 @@ export default function AdminTestsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-28">Test ID</TableHead>
+                <TableHead className="w-24">Test ID</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead className="w-32">Price</TableHead>
                 <TableHead className="w-36 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="py-10 text-center text-text-secondary">
+                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   </TableCell>
                 </TableRow>
               ) : tests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="py-10 text-center text-text-secondary">
+                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
                     No tests yet. Add your first one above.
                   </TableCell>
                 </TableRow>
@@ -240,6 +267,7 @@ export default function AdminTestsPage() {
                       {test.testId}
                     </TableCell>
                     <TableCell>{test.description}</TableCell>
+                    <TableCell>{formatPrice(test.price)}</TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
                         <Button

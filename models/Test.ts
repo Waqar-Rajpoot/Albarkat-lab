@@ -4,6 +4,7 @@ export interface ITest {
   _id: string;
   testId: number;
   description: string;
+  price: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +20,11 @@ const TestSchema = new Schema<ITest>(
       type: String,
       required: [true, "Description is required"],
       trim: true,
+    },
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be negative"],
     },
   },
   { timestamps: true }

@@ -20,16 +20,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const category = typeof body.category === "string" ? body.category.trim() : "";
     const procedure = typeof body.procedure === "string" ? body.procedure.trim() : "";
+    const price = Number(body.price);
 
-    if (!category || !procedure) {
+    if (!category || !procedure || !Number.isFinite(price) || price < 0) {
         return NextResponse.json(
-            { error: "Both category and procedure are required" },
+            { error: "Category, procedure, and a non-negative price are required" },
             { status: 400 }
         );
     }
 
     await connectToDatabase();
-    const xray = await XRay.create({ category, procedure });
+    const xray = await XRay.create({ category, procedure, price });
 
     return NextResponse.json({ xray }, { status: 201 });
 }

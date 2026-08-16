@@ -19,10 +19,11 @@ export async function PUT(
     const body = await request.json();
     const category = typeof body.category === "string" ? body.category.trim() : "";
     const procedure = typeof body.procedure === "string" ? body.procedure.trim() : "";
+    const price = Number(body.price);
 
-    if (!category || !procedure) {
+    if (!category || !procedure || !Number.isFinite(price) || price < 0) {
         return NextResponse.json(
-            { error: "Both category and procedure are required" },
+            { error: "Category, procedure, and a non-negative price are required" },
             { status: 400 }
         );
     }
@@ -30,7 +31,7 @@ export async function PUT(
     await connectToDatabase();
     const xray = await XRay.findByIdAndUpdate(
         id,
-        { category, procedure },
+        { category, procedure, price },
         { new: true, runValidators: true }
     );
 

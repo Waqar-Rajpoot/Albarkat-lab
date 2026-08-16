@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import Link from "next/link";
 import {
-  ArrowLeft,
   Bone,
   Loader2,
   Pencil,
@@ -37,9 +35,21 @@ type XRay = {
   _id: string;
   category: string;
   procedure: string;
+  price: number;
 };
 
-const emptyForm = { category: "", procedure: "" };
+const emptyForm = { category: "", procedure: "", price: "" };
+
+const priceFormatter = new Intl.NumberFormat("en-PK", {
+  style: "currency",
+  currency: "PKR",
+  maximumFractionDigits: 2,
+});
+
+function formatPrice(price: number) {
+  if (!Number.isFinite(price)) return "—";
+  return priceFormatter.format(price);
+}
 
 export default function AdminXRaysPage() {
   const [xrays, setXrays] = useState<XRay[]>([]);
@@ -69,15 +79,17 @@ export default function AdminXRaysPage() {
   }
 
   useEffect(() => {
-    // Standard fetch-on-mount pattern; loadXrays manages its own
-    // loading/error state internally.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadXrays();
   }, []);
 
   function startEdit(xray: XRay) {
     setEditingId(xray._id);
-    setForm({ category: xray.category, procedure: xray.procedure });
+    setForm({
+      category: xray.category,
+      procedure: xray.procedure,
+      price: Number.isFinite(xray.price) ? String(xray.price) : "",
+    });
   }
 
   function cancelEdit() {
@@ -96,7 +108,11 @@ export default function AdminXRaysPage() {
         {
           method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            category: form.category,
+            procedure: form.procedure,
+            price: Number(form.price),
+          }),
         }
       );
       const data = await res.json();
@@ -147,7 +163,6 @@ export default function AdminXRaysPage() {
               </p>
             </div>
           </div>
-
         </div>
 
         <form
@@ -158,7 +173,7 @@ export default function AdminXRaysPage() {
             {editingId ? "Edit procedure" : "Add a new procedure"}
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-[1fr_1fr_140px]">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="category">Category</Label>
               <Input
@@ -179,6 +194,19 @@ export default function AdminXRaysPage() {
                 required
                 value={form.procedure}
                 onChange={(e) => setForm({ ...form, procedure: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="price">Price (PKR)</Label>
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="1500"
+                required
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
             </div>
           </div>
@@ -213,21 +241,22 @@ export default function AdminXRaysPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-56">Category</TableHead>
+                <TableHead className="w-48">Category</TableHead>
                 <TableHead>Procedure</TableHead>
+                <TableHead className="w-32">Price</TableHead>
                 <TableHead className="w-36 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="py-10 text-center text-text-secondary">
+                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   </TableCell>
                 </TableRow>
               ) : xrays.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="py-10 text-center text-text-secondary">
+                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
                     No X-ray procedures yet. Add your first one above.
                   </TableCell>
                 </TableRow>
@@ -238,6 +267,7 @@ export default function AdminXRaysPage() {
                       {xray.category}
                     </TableCell>
                     <TableCell>{xray.procedure}</TableCell>
+                    <TableCell>{formatPrice(xray.price)}</TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
                         <Button

@@ -20,10 +20,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const testId = Number(body.testId);
     const description = typeof body.description === "string" ? body.description.trim() : "";
+    const price = Number(body.price);
 
-    if (!Number.isFinite(testId) || !description) {
+    if (!Number.isFinite(testId) || !description || !Number.isFinite(price) || price < 0) {
         return NextResponse.json(
-            { error: "A numeric Test ID and a description are required" },
+            { error: "A numeric Test ID, a description, and a non-negative price are required" },
             { status: 400 }
         );
     }
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
 
     try {
-        const test = await Test.create({ testId, description });
+        const test = await Test.create({ testId, description, price });
         return NextResponse.json({ test }, { status: 201 });
     } catch (err: unknown) {
         if (isDuplicateKeyError(err)) {
