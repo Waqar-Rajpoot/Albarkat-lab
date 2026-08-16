@@ -4,7 +4,17 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bone, ChevronDown, FlaskConical, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import {
+  Bone,
+  ChevronDown,
+  FlaskConical,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  Users,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useClickOutside } from "@/hooks/use-click-outside";
@@ -13,6 +23,8 @@ const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/xrays", label: "X-Rays", icon: Bone },
   { href: "/admin/tests", label: "Lab Tests", icon: FlaskConical },
+  { href: "/admin/packages", label: "Packages", icon: Package },
+  { href: "/admin/users", label: "Users", icon: Users },
 ];
 
 function getInitials(name?: string | null, email?: string | null) {

@@ -3,7 +3,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Loader2,
-  MessageCircle,
   Package as PackageIcon,
   Pencil,
   Plus,
@@ -14,14 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -191,10 +182,6 @@ export default function AdminPackagesPage() {
     }
   }
 
-  const previewTests = form.includedTests.filter((t) => t.trim().length > 0);
-  const previewDiscounted = Number(form.discountedPrice);
-  const previewOriginal = Number(form.originalPrice);
-
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:py-16">
@@ -210,7 +197,7 @@ export default function AdminPackagesPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div className="mx-auto w-full max-w-2xl">
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-5 shadow-sm"
@@ -334,75 +321,75 @@ export default function AdminPackagesPage() {
           </p>
         )}
 
-        <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead className="w-32">Price</TableHead>
-                <TableHead className="w-24">Tests</TableHead>
-                <TableHead className="w-36 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
-                    <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-                  </TableCell>
-                </TableRow>
-              ) : packages.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
-                    No packages yet. Add your first one above.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                packages.map((pkg) => (
-                  <TableRow key={pkg._id}>
-                    <TableCell className="font-medium text-text">{pkg.title}</TableCell>
-                    <TableCell>
-                      <span className="font-medium text-text">
-                        {formatPrice(pkg.discountedPrice)}
-                      </span>{" "}
-                      <span className="text-text-secondary line-through">
-                        {formatPrice(pkg.originalPrice)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-text-secondary">
-                      {pkg.includedTests.length}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => startEdit(pkg)}
-                          aria-label={`Edit ${pkg.title}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-error hover:bg-error-light hover:text-error"
-                          onClick={() => setDeleteTarget(pkg)}
-                          disabled={deletingId === pkg._id}
-                          aria-label={`Delete ${pkg.title}`}
-                        >
-                          {deletingId === pkg._id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+        <div>
+          {loading ? (
+            <div className="flex justify-center py-10 text-text-secondary">
+              <Loader2 className="h-5 w-5 animate-spin" />
+            </div>
+          ) : packages.length === 0 ? (
+            <div className="rounded-lg border border-border bg-surface py-10 text-center text-text-secondary shadow-sm">
+              No packages yet. Add your first one above.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {packages.map((pkg) => (
+                <div
+                  key={pkg._id}
+                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-semibold text-text">{pkg.title}</h3>
+                    <div className="flex shrink-0 gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startEdit(pkg)}
+                        aria-label={`Edit ${pkg.title}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-error hover:bg-error-light hover:text-error"
+                        onClick={() => setDeleteTarget(pkg)}
+                        disabled={deletingId === pkg._id}
+                        aria-label={`Delete ${pkg.title}`}
+                      >
+                        {deletingId === pkg._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-text-secondary">{pkg.description}</p>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-semibold text-text">
+                      Rs {formatPrice(pkg.discountedPrice)}
+                    </span>
+                    <span className="text-sm text-text-secondary line-through">
+                      Rs {formatPrice(pkg.originalPrice)}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+                    <span className="text-xs font-medium uppercase tracking-wide text-text-secondary">
+                      Included tests ({pkg.includedTests.length})
+                    </span>
+                    <ul className="list-inside list-disc text-sm text-text">
+                      {pkg.includedTests.map((test, i) => (
+                        <li key={i}>{test}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
