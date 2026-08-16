@@ -20,7 +20,7 @@ export function GoogleButton() {
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="flex w-full items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/80 transition hover:bg-black/5 disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+      className="flex w-full hover:cursor-pointer items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/80 transition hover:bg-black/5 disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
         <path
@@ -40,7 +40,7 @@ export function GoogleButton() {
           d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"
         />
       </svg>
-      {loading ? "Redirecting..." : "Continue with Google"}
+      {loading ? <span className="text-gray-500">Loading...</span> : <span className="text-gray-500">Continue with Google</span>}
     </button>
   );
 }

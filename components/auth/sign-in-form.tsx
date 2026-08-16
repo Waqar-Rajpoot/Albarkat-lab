@@ -1,7 +1,131 @@
+// "use client";
+
+// import { useState, type FormEvent } from "react";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth-client";
+// import { roleRedirectPath } from "@/lib/role-redirect";
+
+// export function SignInForm() {
+//   const router = useRouter();
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState<string | null>(null);
+//   const [needsVerification, setNeedsVerification] = useState(false);
+//   const [resent, setResent] = useState(false);
+//   const [loading, setLoading] = useState(false);
+
+//   async function handleSubmit(e: FormEvent) {
+//     e.preventDefault();
+//     setError(null);
+//     setNeedsVerification(false);
+//     setResent(false);
+//     setLoading(true);
+
+//     const { data, error } = await authClient.signIn.email({
+//       email,
+//       password,
+//     });
+
+//     setLoading(false);
+
+//     if (error) {
+//       // Better Auth returns this specific code when requireEmailVerification
+//       // is on and the user hasn't clicked the link yet.
+//       if (error.code === "EMAIL_NOT_VERIFIED") {
+//         setNeedsVerification(true);
+//       } else {
+//         setError(error.message ?? "Something went wrong. Please try again.");
+//       }
+//       return;
+//     }
+
+//     router.push(roleRedirectPath(data.user.role));
+//   }
+
+//   async function handleResend() {
+//     await authClient.sendVerificationEmail({
+//       email,
+//       callbackURL: "/auth/redirect",
+//     });
+//     setResent(true);
+//   }
+
+//   return (
+//     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+//       <div className="flex flex-col gap-1.5">
+//         <label htmlFor="email" className="text-sm font-medium">
+//           Email
+//         </label>
+//         <input
+//           id="email"
+//           type="email"
+//           required
+//           autoComplete="email"
+//           value={email}
+//           onChange={(e) => setEmail(e.target.value)}
+//           className="rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
+//         />
+//       </div>
+
+//       <div className="flex flex-col gap-1.5">
+//         <label htmlFor="password" className="text-sm font-medium">
+//           Password
+//         </label>
+//         <input
+//           id="password"
+//           type="password"
+//           required
+//           autoComplete="current-password"
+//           value={password}
+//           onChange={(e) => setPassword(e.target.value)}
+//           className="rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
+//         />
+//       </div>
+
+//       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+
+//       {needsVerification && (
+//         <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm">
+//           <p>Please verify your email before signing in.</p>
+//           {resent ? (
+//             <p className="mt-1 text-black/60 dark:text-white/60">Verification email sent — check your inbox.</p>
+//           ) : (
+//             <button
+//               type="button"
+//               onClick={handleResend}
+//               className="mt-1 font-medium underline underline-offset-4"
+//             >
+//               Resend verification email
+//             </button>
+//           )}
+//         </div>
+//       )}
+
+//       <button
+//         type="submit"
+//         disabled={loading}
+//         className="mt-2 rounded-md bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-white/85"
+//       >
+//         {loading ? "Signing in..." : "Sign in"}
+//       </button>
+//     </form>
+//   );
+// }
+
+
+
+
+
+
 "use client";
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { roleRedirectPath } from "@/lib/role-redirect";
 
@@ -9,6 +133,7 @@ export function SignInForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resent, setResent] = useState(false);
@@ -53,47 +178,74 @@ export function SignInForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium">
-          Email
-        </label>
-        <input
+        <Label htmlFor="email">Email</Label>
+        <Input
           id="email"
           type="email"
+          placeholder="you@example.com"
           required
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
-        />
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <Link
+            href="/forgot-password"
+            className="text-xs font-medium text-secondary hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="pr-16"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-0 flex items-center gap-1 px-3 text-xs font-medium text-text-secondary transition-colors hover:text-text"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
       </div>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && (
+        <p className="rounded-md border border-error-light bg-error-light px-3 py-2 text-sm text-error">
+          {error}
+        </p>
+      )}
 
       {needsVerification && (
-        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm">
+        <div className="rounded-md border border-warning-light bg-warning-light px-3 py-2.5 text-sm text-text">
           <p>Please verify your email before signing in.</p>
           {resent ? (
-            <p className="mt-1 text-black/60 dark:text-white/60">Verification email sent — check your inbox.</p>
+            <p className="mt-1 text-text-secondary">
+              Verification email sent — check your inbox.
+            </p>
           ) : (
             <button
               type="button"
               onClick={handleResend}
-              className="mt-1 font-medium underline underline-offset-4"
+              className="mt-1 font-medium text-secondary underline underline-offset-4"
             >
               Resend verification email
             </button>
@@ -101,13 +253,10 @@ export function SignInForm() {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 rounded-md bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-white/85"
-      >
+      <Button type="submit" variant="success" disabled={loading} className="mt-2">
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
         {loading ? "Signing in..." : "Sign in"}
-      </button>
+      </Button>
     </form>
   );
 }
