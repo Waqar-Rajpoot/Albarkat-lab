@@ -8,11 +8,10 @@ import {
   Bone,
   ChevronDown,
   FlaskConical,
-  LayoutDashboard,
+  Home,
   LogOut,
   Menu,
   Package,
-  Users,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,11 +19,10 @@ import { authClient } from "@/lib/auth-client";
 import { useClickOutside } from "@/hooks/use-click-outside";
 
 const links = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/xrays", label: "X-Rays", icon: Bone },
-  { href: "/admin/tests", label: "Lab Tests", icon: FlaskConical },
-  { href: "/admin/packages", label: "Packages", icon: Package },
-  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/", label: "Home", icon: Home, exact: true },
+  { href: "/book-test", label: "Book a Test", icon: FlaskConical },
+  { href: "/book-xray", label: "Book an X-Ray", icon: Bone },
+  { href: "/book-package", label: "Book a Package", icon: Package },
 ];
 
 function getInitials(name?: string | null, email?: string | null) {
@@ -34,10 +32,10 @@ function getInitials(name?: string | null, email?: string | null) {
       ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
       : parts[0].slice(0, 2).toUpperCase();
   }
-  return email?.slice(0, 2).toUpperCase() ?? "AD";
+  return email?.slice(0, 2).toUpperCase() ?? "U";
 }
 
-export function AdminNavbar() {
+export function PublicNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -59,7 +57,7 @@ export function AdminNavbar() {
     <header className="sticky top-0 z-40 border-b border-border bg-surface">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
         {/* Left: logo */}
-        <Link href="/admin" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
             src="/al_barkat_logo_vector-1.svg"
             alt="AL-Barkat Lab"
@@ -97,59 +95,68 @@ export function AdminNavbar() {
 
         {/* Right: profile + mobile toggle */}
         <div className="flex shrink-0 items-center gap-2">
-          <div className="relative hidden md:block" ref={profileMenuRef}>
-            <button
-              type="button"
-              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              aria-expanded={isProfileMenuOpen}
-              aria-haspopup="menu"
-              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-text transition-colors hover:bg-background-light"
-            >
-              {user?.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.name ?? "Admin"}
-                  width={28}
-                  height={28}
-                  className="rounded-full"
-                />
-              ) : (
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                  {getInitials(user?.name, user?.email)}
-                </span>
-              )}
-              <span className="max-w-40 truncate">{user?.name ?? "Admin"}</span>
-              <ChevronDown className="h-4 w-4 text-text-secondary" />
-            </button>
-
-            {isProfileMenuOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 top-full mt-2 w-56 rounded-md border border-border bg-surface py-1 shadow-lg"
+          {user ? (
+            <div className="relative hidden md:block" ref={profileMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                aria-expanded={isProfileMenuOpen}
+                aria-haspopup="menu"
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-text transition-colors hover:bg-background-light"
               >
-                <div className="border-b border-border px-3 py-2">
-                  <p className="truncate text-sm font-medium text-text">{user?.name ?? "Admin"}</p>
-                  <p className="truncate text-xs text-text-secondary">{user?.email}</p>
-                </div>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-light hover:text-text"
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name ?? "Profile"}
+                    width={28}
+                    height={28}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                    {getInitials(user.name, user.email)}
+                  </span>
+                )}
+                <span className="max-w-[10rem] truncate">{user.name ?? "Account"}</span>
+                <ChevronDown className="h-4 w-4 text-text-secondary" />
+              </button>
+
+              {isProfileMenuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full mt-2 w-56 rounded-md border border-border bg-surface py-1 shadow-lg"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </button>
-              </div>
-            )}
-          </div>
+                  <div className="border-b border-border px-3 py-2">
+                    <p className="truncate text-sm font-medium text-text">{user.name ?? "Account"}</p>
+                    <p className="truncate text-xs text-text-secondary">{user.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-background-light hover:text-text"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="hidden rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90 md:block"
+            >
+              Sign in
+            </Link>
+          )}
 
           {/* Mobile menu toggle */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             aria-expanded={isMobileMenuOpen}
-            aria-controls="admin-mobile-nav"
+            aria-controls="public-mobile-nav"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-background-light hover:text-text md:hidden"
           >
@@ -160,32 +167,42 @@ export function AdminNavbar() {
 
       {/* Mobile nav panel */}
       <div
-        id="admin-mobile-nav"
+        id="public-mobile-nav"
         className={cn(
           "overflow-hidden border-t border-border bg-surface transition-[max-height] duration-200 ease-in-out md:hidden",
           isMobileMenuOpen ? "max-h-96" : "max-h-0 border-t-0"
         )}
       >
         <nav className="flex flex-col gap-1 px-4 py-3">
-          <div className="mb-1 flex items-center gap-2 border-b border-border px-1 pb-3">
-            {user?.image ? (
-              <Image
-                src={user.image}
-                alt={user.name ?? "Admin"}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-            ) : (
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                {getInitials(user?.name, user?.email)}
-              </span>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-text">{user?.name ?? "Admin"}</p>
-              <p className="truncate text-xs text-text-secondary">{user?.email}</p>
+          {user ? (
+            <div className="mb-1 flex items-center gap-2 border-b border-border px-1 pb-3">
+              {user.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.name ?? "Profile"}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                  {getInitials(user.name, user.email)}
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-text">{user.name ?? "Account"}</p>
+                <p className="truncate text-xs text-text-secondary">{user.email}</p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <Link
+              href="/sign-in"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="mb-1 rounded-md bg-primary px-3 py-2 text-center text-sm font-medium text-white"
+            >
+              Sign in
+            </Link>
+          )}
 
           {links.map(({ href, label, icon: Icon, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href);
@@ -208,14 +225,16 @@ export function AdminNavbar() {
             );
           })}
 
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="mt-2 flex items-center gap-2 rounded-md border-t border-border px-3 pt-3 text-sm font-medium text-text-secondary transition-colors hover:text-text"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </button>
+          {user && (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="mt-2 flex items-center gap-2 rounded-md border-t border-border px-3 pt-3 text-sm font-medium text-text-secondary transition-colors hover:text-text"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          )}
         </nav>
       </div>
     </header>

@@ -1,220 +1,164 @@
-'use client';
+import Link from "next/link";
+import { Bone, FlaskConical, Package, ShieldCheck, Clock, Award } from "lucide-react";
 
-import Image from "next/image";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <div 
-      className="flex flex-col flex-1 items-center justify-center min-h-screen font-sans"
-      style={{ backgroundColor: 'var(--color-background-light)' }}
-    >
-      {/* Header Navigation */}
-      <header 
-        className="w-full py-4 px-6 shadow-sm"
-        style={{ backgroundColor: 'var(--color-surface)' }}
-      >
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-navy-dark)' }}>
-            🏥 Albarkat Lab
+    <div className="flex flex-col">
+      {/* Hero */}
+      <section className="bg-background px-4 py-20 sm:py-28">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+          <span className="rounded-full border border-border bg-surface px-4 py-1 text-xs font-medium text-text-secondary">
+            Trusted Diagnostics, Close to Home
+          </span>
+          <h1 className="text-4xl font-bold tracking-tight text-text sm:text-5xl">
+            Your Health, <span className="text-primary">Accurately Measured</span>
           </h1>
-          <nav className="flex gap-6">
-            <a href="#" style={{ color: 'var(--color-text-dark)' }} className="hover:font-semibold transition">
-              Home
-            </a>
-            <a href="#" style={{ color: 'var(--color-text-gray)' }} className="hover:font-semibold transition">
-              Services
-            </a>
-            <a href="/sign-in" style={{ color: 'var(--color-text-gray)' }} className="hover:font-semibold transition">
-              Sign in
-            </a>
-          </nav>
+          <p className="max-w-xl text-base text-text-secondary sm:text-lg">
+            AL-Barkat Lab brings you reliable lab tests, X-ray imaging, and complete
+            health checkup packages — with fast results you can trust.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/book-test"
+              className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              Book a Test
+            </Link>
+            <Link
+              href="/book-package"
+              className="rounded-md border border-border bg-surface px-6 py-2.5 text-sm font-medium text-text transition-colors hover:bg-background-light"
+            >
+              View Health Packages
+            </Link>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <main className="flex flex-1 w-full max-w-6xl flex-col items-center justify-between py-16 px-6 sm:px-12">
-        
-        {/* Hero Section */}
-        <div className="flex flex-col items-center gap-8 text-center w-full mb-12">
-          <div 
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'var(--color-accent-blue-light)' }}
-          >
-            <p style={{ color: 'var(--color-accent-blue)' }} className="font-semibold text-sm">
-              ✨ Welcome to Your Healthcare Solution
+      {/* About / explain the lab */}
+      <section className="border-t border-border bg-surface px-4 py-16">
+        <div className="mx-auto flex max-w-5xl flex-col gap-10 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <h2 className="text-2xl font-semibold text-text sm:text-3xl">
+              About AL-Barkat Lab
+            </h2>
+            <p className="mt-4 text-text-secondary">
+              AL-Barkat Lab is a diagnostic center dedicated to accurate, timely, and
+              affordable healthcare testing. From routine blood work to detailed
+              imaging and full-body checkup packages, our certified technicians and
+              modern equipment ensure every result you receive is one you can rely on.
+            </p>
+            <p className="mt-3 text-text-secondary">
+              We built our booking process to be simple — choose a test, X-ray, or
+              package online, pick a convenient time, and get your results without
+              the wait.
             </p>
           </div>
 
-          <h2 
-            className="text-4xl md:text-5xl font-bold max-w-2xl leading-tight"
-            style={{ color: 'var(--color-navy-dark)' }}
-          >
-            Professional Lab Testing & Home Sampling Services
+          <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-background p-5 text-center">
+              <ShieldCheck className="h-6 w-6 text-primary" />
+              <p className="text-sm font-medium text-text">Accurate Results</p>
+              <p className="text-xs text-text-secondary">
+                Certified labs and calibrated equipment
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-background p-5 text-center">
+              <Clock className="h-6 w-6 text-primary" />
+              <p className="text-sm font-medium text-text">Fast Turnaround</p>
+              <p className="text-xs text-text-secondary">
+                Quick reporting, no long waits
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-background p-5 text-center">
+              <Award className="h-6 w-6 text-primary" />
+              <p className="text-sm font-medium text-text">Trusted Experience</p>
+              <p className="text-xs text-text-secondary">
+                Years of dependable community service
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-semibold text-text sm:text-3xl">
+              Our Services
+            </h2>
+            <p className="mt-2 text-text-secondary">
+              Everything you need, all in one place.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
+              <FlaskConical className="h-8 w-8 text-primary" />
+              <h3 className="text-lg font-semibold text-text">Lab Tests</h3>
+              <p className="text-sm text-text-secondary">
+                Blood work, urine analysis, and a wide range of diagnostic panels —
+                book online in minutes.
+              </p>
+              <Link
+                href="/book-test"
+                className="mt-2 text-sm font-medium text-secondary hover:underline"
+              >
+                Book a Test →
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
+              <Bone className="h-8 w-8 text-primary" />
+              <h3 className="text-lg font-semibold text-text">X-Ray Imaging</h3>
+              <p className="text-sm text-text-secondary">
+                Digital X-ray imaging with fast reporting, reviewed by experienced
+                radiologists.
+              </p>
+              <Link
+                href="/book-xray"
+                className="mt-2 text-sm font-medium text-secondary hover:underline"
+              >
+                Book an X-Ray →
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
+              <Package className="h-8 w-8 text-primary" />
+              <h3 className="text-lg font-semibold text-text">Health Packages</h3>
+              <p className="text-sm text-text-secondary">
+                Full-body checkup bundles that combine multiple tests at a better
+                value.
+              </p>
+              <Link
+                href="/book-package"
+                className="mt-2 text-sm font-medium text-secondary hover:underline"
+              >
+                View Packages →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-border bg-primary px-4 py-14">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+          <h2 className="text-2xl font-semibold text-white sm:text-3xl">
+            Ready to book your test?
           </h2>
-
-          <p 
-            className="max-w-xl text-lg leading-8"
-            style={{ color: 'var(--color-text-gray)' }}
-          >
-            Get trusted lab results delivered to your door. Book your appointment today and experience convenient healthcare at your fingertips.
+          <p className="text-sm text-white/85 sm:text-base">
+            Create an account and book your lab test, X-ray, or health package in
+            just a few clicks.
           </p>
+          <Link
+            href="/sign-up"
+            className="rounded-md bg-white px-6 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-white/90"
+          >
+            Get Started
+          </Link>
         </div>
-
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-12">
-          {/* Card 1 */}
-          <div 
-            className="p-6 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--color-surface)' }}
-          >
-            <div 
-              className="text-3xl mb-4"
-              style={{ color: 'var(--color-green)' }}
-            >
-              ✓
-            </div>
-            <h3 
-              className="text-xl font-semibold mb-2"
-              style={{ color: 'var(--color-navy-dark)' }}
-            >
-              Home Sampling
-            </h3>
-            <p style={{ color: 'var(--color-text-gray)' }}>
-              Convenient sample collection from the comfort of your home.
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div 
-            className="p-6 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--color-surface)' }}
-          >
-            <div 
-              className="text-3xl mb-4"
-              style={{ color: 'var(--color-green)' }}
-            >
-              ✓
-            </div>
-            <h3 
-              className="text-xl font-semibold mb-2"
-              style={{ color: 'var(--color-navy-dark)' }}
-            >
-              Trusted Results
-            </h3>
-            <p style={{ color: 'var(--color-text-gray)' }}>
-              Certified lab with years of experience and accuracy.
-            </p>
-          </div>
-
-          {/* Card 3 */}
-          <div 
-            className="p-6 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--color-surface)' }}
-          >
-            <div 
-              className="text-3xl mb-4"
-              style={{ color: 'var(--color-green)' }}
-            >
-              ✓
-            </div>
-            <h3 
-              className="text-xl font-semibold mb-2"
-              style={{ color: 'var(--color-navy-dark)' }}
-            >
-              Quick Reports
-            </h3>
-            <p style={{ color: 'var(--color-text-gray)' }}>
-              Fast turnaround time for all your test results.
-            </p>
-          </div>
-        </div>
-
-        {/* CTA Buttons Section */}
-        <div className="flex flex-col gap-4 w-full sm:flex-row justify-center">
-          <a
-            className="flex h-12 items-center justify-center gap-2 rounded-full px-8 font-medium transition-all duration-300"
-            href="#"
-            style={{ 
-              backgroundColor: 'var(--color-green)',
-              color: 'var(--color-surface)'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-green-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-green)'}
-          >
-            📅 Book Appointment
-          </a>
-
-          <a
-            className="flex h-12 items-center justify-center gap-2 rounded-full px-8 font-medium transition-all duration-300 border-2"
-            href="#"
-            style={{ 
-              borderColor: 'var(--color-accent-blue)',
-              color: 'var(--color-accent-blue)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-accent-blue-light)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            📱 WhatsApp Us
-          </a>
-
-          <a
-            className="flex h-12 items-center justify-center gap-2 rounded-full px-8 font-medium transition-all duration-300 border-2"
-            href="#"
-            style={{ 
-              borderColor: 'var(--color-text-gray)',
-              color: 'var(--color-navy-dark)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-background-light)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            Learn More
-          </a>
-        </div>
-
-        {/* Info Banner */}
-        <div 
-          className="mt-16 w-full p-6 rounded-lg flex items-center gap-4"
-          style={{ backgroundColor: 'var(--color-green-light)' }}
-        >
-          <div className="text-3xl">🎖️</div>
-          <div>
-            <h4 
-              className="font-semibold"
-              style={{ color: 'var(--color-green)' }}
-            >
-              Serving with Trusted Badge
-            </h4>
-            <p 
-              style={{ color: 'var(--color-text-dark)' }}
-              className="text-sm"
-            >
-              Certified by health authorities and trusted by thousands of patients.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer 
-        className="w-full py-8 px-6 mt-auto border-t"
-        style={{ 
-          backgroundColor: 'var(--color-surface)',
-          borderColor: 'var(--color-border)'
-        }}
-      >
-        <div className="max-w-6xl mx-auto text-center">
-          <p style={{ color: 'var(--color-text-gray)' }}>
-            © 2026 Albarkat Lab. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      </section>
     </div>
   );
 }
