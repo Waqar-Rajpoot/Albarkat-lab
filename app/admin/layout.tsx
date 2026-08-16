@@ -1,15 +1,13 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { AdminNavbar } from "@/components/admin/admin-navbar";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // The real authorization boundary — proxy.ts only checks that a
-  // session cookie exists, not the user's role, so every /admin route
-  // is gated here too.
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -22,5 +20,10 @@ export default async function AdminLayout({
     redirect("/dashboard");
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen bg-background">
+      <AdminNavbar />
+      {children}
+    </div>
+  );
 }
