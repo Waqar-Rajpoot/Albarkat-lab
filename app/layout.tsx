@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { PublicNavbar } from "@/components/public-navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
       "Book lab tests, X-rays, and full health checkup packages online with AL-Barkat Lab.",
     images: [
       {
-        url: "/og-image.png", // TODO: add a real 1200x630 OG image to /public
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "AL-Barkat Lab",
@@ -74,10 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <PublicNavbar />
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

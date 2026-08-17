@@ -55,7 +55,7 @@ export function PublicNavbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4">
         {/* Left: logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
@@ -117,7 +117,7 @@ export function PublicNavbar() {
                     {getInitials(user.name, user.email)}
                   </span>
                 )}
-                <span className="max-w-[10rem] truncate">{user.name ?? "Account"}</span>
+                <span className="max-w-40 truncate">{user.name ?? "Account"}</span>
                 <ChevronDown className="h-4 w-4 text-text-secondary" />
               </button>
 
