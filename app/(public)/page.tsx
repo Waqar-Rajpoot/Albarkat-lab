@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Bone, FlaskConical, Package, ShieldCheck, Clock, Award } from "lucide-react";
+import { WhyChooseUsCarousel } from "@/components/why-choose-us-carousel";
+import { PackagesCarousel } from "@/components/packages-carousel";
 
 export default function HomePage() {
   return (
@@ -39,19 +41,27 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl flex-col gap-10 sm:flex-row sm:items-center">
           <div className="flex-1">
             <h2 className="text-2xl font-semibold text-text sm:text-3xl">
-              About AL-Barkat Lab
+              About AL-Barkat Lab&apos;z &amp; Digital X-Ray
             </h2>
             <p className="mt-4 text-text-secondary">
-              AL-Barkat Lab is a diagnostic center dedicated to accurate, timely, and
-              affordable healthcare testing. From routine blood work to detailed
-              imaging and full-body checkup packages, our certified technicians and
-              modern equipment ensure every result you receive is one you can rely on.
+              Founded in 1990 as New Nishtar Clinical Lab, we were the first
+              diagnostic laboratory established in Abdul Hakeem. Today, under
+              the leadership of CEO Muhammad Ibrahim, that legacy continues on
+              Multan Road as AL-Barkat Lab&apos;z &amp; Digital X-Ray — combining
+              over 36 years of experience with modern lab testing, Digital
+              X-Ray, and Home Sample Collection.
             </p>
             <p className="mt-3 text-text-secondary">
               We built our booking process to be simple — choose a test, X-ray, or
               package online, pick a convenient time, and get your results without
               the wait.
             </p>
+            <Link
+              href="/about"
+              className="mt-4 inline-block text-sm font-medium text-secondary hover:underline"
+            >
+              Learn more about us →
+            </Link>
           </div>
 
           <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
@@ -138,6 +148,39 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us — carousel */}
+      <section className="border-t border-border bg-surface px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-semibold text-text sm:text-3xl">
+              Why Choose AL-Barkat Lab&apos;z?
+            </h2>
+            <p className="mt-2 text-text-secondary">
+              Reasons patients across Abdul Hakeem have trusted us for over
+              three decades.
+            </p>
+          </div>
+
+          <WhyChooseUsCarousel />
+        </div>
+      </section>
+
+      {/* Health Packages — carousel */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-semibold text-text sm:text-3xl">
+              Discount Offers
+            </h2>
+            <p className="mt-2 text-text-secondary">
+              Bundled tests at a better value.
+            </p>
+          </div>
+
+          <PackagesCarousel />
         </div>
       </section>
 

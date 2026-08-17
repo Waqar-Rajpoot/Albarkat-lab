@@ -9,6 +9,8 @@ import {
   ChevronDown,
   FlaskConical,
   Home,
+  Info,
+  Syringe,
   LogOut,
   Menu,
   Package,
@@ -20,9 +22,11 @@ import { useClickOutside } from "@/hooks/use-click-outside";
 
 const links = [
   { href: "/", label: "Home", icon: Home, exact: true },
-  { href: "/book-test", label: "Book a Test", icon: FlaskConical },
-  { href: "/book-xray", label: "Book an X-Ray", icon: Bone },
-  { href: "/book-package", label: "Book a Package", icon: Package },
+  { href: "/about", label: "About Us", icon: Info, exact: true },
+  { href: "/book-test", label: "Test", icon: FlaskConical },
+  { href: "/book-xray", label: "X-Ray", icon: Bone },
+  { href: "/book-package", label: "Package", icon: Package },
+  { href: "/home-sampling", label: "Home Sampling", icon: Syringe },
 ];
 
 function getInitials(name?: string | null, email?: string | null) {
