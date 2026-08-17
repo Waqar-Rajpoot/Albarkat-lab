@@ -135,16 +135,15 @@ export default function HomePage() {
 
             <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
               <Package className="h-8 w-8 text-primary" />
-              <h3 className="text-lg font-semibold text-text">Health Packages</h3>
+              <h3 className="text-lg font-semibold text-text">Home Sampling</h3>
               <p className="text-sm text-text-secondary">
-                Full-body checkup bundles that combine multiple tests at a better
-                value.
+                Convenient at-home sample collection for accurate diagnostic results.
               </p>
               <Link
-                href="/book-package"
+                href="/home-sampling"
                 className="mt-2 text-sm font-medium text-secondary hover:underline"
               >
-                View Packages →
+                Learn More →
               </Link>
             </div>
           </div>
@@ -181,25 +180,6 @@ export default function HomePage() {
           </div>
 
           <PackagesCarousel />
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="border-t border-border bg-primary px-4 py-14">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <h2 className="text-2xl font-semibold text-white sm:text-3xl">
-            Ready to book your test?
-          </h2>
-          <p className="text-sm text-white/85 sm:text-base">
-            Create an account and book your lab test, X-ray, or health package in
-            just a few clicks.
-          </p>
-          <Link
-            href="/sign-up"
-            className="rounded-md bg-white px-6 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-white/90"
-          >
-            Get Started
-          </Link>
         </div>
       </section>
     </div>
