@@ -1,9 +1,32 @@
 import Link from "next/link";
 import { Bone, FlaskConical, Package, ShieldCheck, Clock, Award } from "lucide-react";
+import { connectToDatabase } from "@/lib/mongodb";
+import PackageModel from "@/models/Package";
 import { WhyChooseUsCarousel } from "@/components/why-choose-us-carousel";
-import { PackagesCarousel } from "@/components/packages-carousel";
+import { PackagesCarousel, type HealthPackage } from "@/components/packages-carousel";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+async function getFeaturedPackages(): Promise<HealthPackage[]> {
+  await connectToDatabase();
+  const packages = await PackageModel.find({ isFeatured: true })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return packages.map((p) => ({
+    id: String(p._id),
+    title: p.title,
+    description: p.description,
+    discountedPrice: p.discountedPrice,
+    originalPrice: p.originalPrice,
+    includedTests: p.includedTests,
+    isFeatured: p.isFeatured,
+  }));
+}
+
+export default async function HomePage() {
+  const featuredPackages = await getFeaturedPackages();
+
   return (
     <div className="flex flex-col">
       {/* Hero */}
@@ -179,7 +202,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <PackagesCarousel />
+          <PackagesCarousel packages={featuredPackages} />
         </div>
       </section>
     </div>

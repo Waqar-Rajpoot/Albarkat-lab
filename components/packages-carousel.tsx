@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, MessageCircle, Sparkles } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -9,8 +9,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { BookingDetailsDialog } from "@/components/booking/booking-details-dialog";
+import type { PatientInfo } from "@/lib/patient-info";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-type HealthPackage = {
+export type HealthPackage = {
   id: string;
   title: string;
   description: string;
@@ -20,78 +23,57 @@ type HealthPackage = {
   isFeatured: boolean;
 };
 
-const packages: HealthPackage[] = [
-  {
-    id: "6a817102bfd4f4584248a7a6",
-    title: "Diabetes",
-    description: "this is sugur diese",
-    discountedPrice: 12000,
-    originalPrice: 15000,
-    includedTests: ["blood test", "blood sugur", "brain test", "eye test"],
-    isFeatured: false,
-  },
-  {
-    id: "6a817102bfd4f4094248a7a6",
-    title: "Diabetes",
-    description: "this is sugur diese",
-    discountedPrice: 12000,
-    originalPrice: 15000,
-    includedTests: ["blood test", "blood sugur", "brain test", "eye test"],
-    isFeatured: false,
-  },
-  {
-    id: "6a817102bfd4f4304248a7a6",
-    title: "Diabetes",
-    description: "this is sugur diese",
-    discountedPrice: 12000,
-    originalPrice: 15000,
-    includedTests: ["blood test", "blood sugur", "brain test", "eye test"],
-    isFeatured: false,
-  },
-  {
-    id: "6a817102bfd4f4534248a7a6",
-    title: "Diabetes",
-    description: "this is sugur diese",
-    discountedPrice: 12000,
-    originalPrice: 15000,
-    includedTests: ["blood test", "blood sugur", "brain test", "eye test"],
-    isFeatured: false,
-  },
-  {
-    id: "6a817102bfd4f4584248a0a6",
-    title: "Diabetes",
-    description: "this is sugur diese",
-    discountedPrice: 12000,
-    originalPrice: 15000,
-    includedTests: ["blood test", "blood sugur", "brain test", "eye test"],
-    isFeatured: false,
-  },
-  // Sample placeholders — swap for real packages from your DB.
-  {
-    id: "sample-full-body",
-    title: "Full Body Checkup",
-    description: "A complete panel covering the essentials.",
-    discountedPrice: 8000,
-    originalPrice: 10000,
-    includedTests: ["CBC", "LFT", "RFT", "Urine test"],
-    isFeatured: true,
-  },
-  {
-    id: "sample-cardiac",
-    title: "Cardiac Package",
-    description: "Heart-focused screening panel.",
-    discountedPrice: 9500,
-    originalPrice: 12000,
-    includedTests: ["ECG", "Lipid profile", "Blood pressure"],
-    isFeatured: false,
-  },
-];
-
 function formatPKR(value: number) {
   return `Rs. ${value.toLocaleString("en-PK")}`;
 }
 
-export function PackagesCarousel() {
+export function PackagesCarousel({ packages }: { packages: HealthPackage[] }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const selectedPackage = packages.find((p) => p.id === selectedId) ?? null;
+
+  function handleBookClick(pkgId: string) {
+    setSelectedId(pkgId);
+    setDialogOpen(true);
+  }
+
+  function handleConfirm(patient: PatientInfo) {
+    if (!selectedPackage) return;
+
+    const lines = [
+      "*New Health Package Booking*",
+      "",
+      "*Patient Details*",
+      `Name: ${patient.name}`,
+      `Father/Husband Name: ${patient.guardianName}`,
+      `Age: ${patient.age}`,
+      "",
+      "*Selected Package*",
+      `${selectedPackage.title} - ${formatPKR(selectedPackage.discountedPrice)} (was ${formatPKR(selectedPackage.originalPrice)})`,
+      `Includes: ${selectedPackage.includedTests.join(", ")}`,
+    ];
+
+    if (patient.reference.trim()) {
+      lines.push("", `Reference: ${patient.reference.trim()}`);
+    }
+
+    lines.push("", "Please confirm this booking.");
+
+    window.open(buildWhatsAppLink(lines.join("\n")), "_blank");
+    setDialogOpen(false);
+  }
+
+  if (packages.length === 0) {
+    return (
+      <div className="mx-auto w-full max-w-5xl rounded-lg border border-dashed border-border bg-surface p-10 text-center">
+        <p className="text-sm text-text-secondary">
+          No featured packages right now. Please check back later.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Carousel
       opts={{ align: "start", loop: true }}
@@ -153,12 +135,14 @@ export function PackagesCarousel() {
                   ))}
                 </ul>
 
-                <Link
-                  href="/book-package"
-                  className="mt-2 rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                <button
+                  type="button"
+                  onClick={() => handleBookClick(pkg.id)}
+                  className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-primary/90"
                 >
-                  Book This Package
-                </Link>
+                  <MessageCircle className="h-4 w-4" />
+                  Book via WhatsApp
+                </button>
               </div>
             </CarouselItem>
           );
@@ -168,6 +152,19 @@ export function PackagesCarousel() {
         <CarouselPrevious className="static translate-y-0" />
         <CarouselNext className="static translate-y-0" />
       </div>
+
+      <BookingDetailsDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title="Confirm Your Details"
+        description="A few details before we send your package booking on WhatsApp."
+        summary={
+          selectedPackage
+            ? `${selectedPackage.title} · ${formatPKR(selectedPackage.discountedPrice)}`
+            : undefined
+        }
+        onConfirm={handleConfirm}
+      />
     </Carousel>
   );
 }

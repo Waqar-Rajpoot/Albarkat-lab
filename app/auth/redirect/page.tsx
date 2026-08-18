@@ -3,7 +3,11 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { roleRedirectPath } from "@/lib/role-redirect";
 
-export default async function AuthRedirectPage() {
+export default async function AuthRedirectPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -12,5 +16,7 @@ export default async function AuthRedirectPage() {
     redirect("/sign-in");
   }
 
-  redirect(roleRedirectPath(session.user.role));
+  const { redirect: redirectTo } = await searchParams;
+
+  redirect(redirectTo || roleRedirectPath(session.user.role));
 }

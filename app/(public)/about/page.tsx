@@ -23,12 +23,12 @@ export default function AboutPage() {
   return (
     <main className="bg-background-light">
       {/* Hero */}
-      <section className="bg-navy-dark">
+      <section className="bg-surface border-b border-border">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
-          <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+          <h1 className="mt-3 text-3xl font-bold text-text sm:text-4xl md:text-5xl">
             About AL-Barkat Lab&apos;z &amp; Digital X-Ray
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-navy-light sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-text-secondary sm:text-lg">
             36+ years of accurate, reliable, and compassionate diagnostic
             care in Abdul Hakeem.
           </p>

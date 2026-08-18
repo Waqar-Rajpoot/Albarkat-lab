@@ -13,7 +13,7 @@ export function BookingPageShell({
 }) {
   return (
     <main className="bg-background-light">
-      <section className="bg-navy-dark">
+      <section className="bg-surface border-b border-border px-4 py-6 sm:py-8">
         <div className="mx-auto max-w-3xl px-6 py-14 sm:py-16">
           <div className="flex items-center gap-2 text-navy-light">
             <Icon className="h-5 w-5" />
@@ -21,8 +21,8 @@ export function BookingPageShell({
               Book Online
             </span>
           </div>
-          <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl">{title}</h1>
-          <p className="mt-3 max-w-xl text-sm text-white/70 sm:text-base">{subtitle}</p>
+          <h1 className="mt-3 text-3xl font-bold text-text sm:text-4xl">{title}</h1>
+          <p className="mt-3 max-w-xl text-sm text-text-secondary sm:text-base">{subtitle}</p>
         </div>
       </section>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BookingDetailsDialog } from "@/components/booking/booking-details-dialog";
@@ -11,12 +12,18 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export function HomeSamplingForm() {
   const [problem, setProblem] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [attempted, setAttempted] = useState(false);
 
+  const problemIsValid = problem.trim().length > 0;
+  const phoneIsValid = phone.trim().length > 0;
+  const addressIsValid = address.trim().length > 0;
+
   function handleContinue() {
     setAttempted(true);
-    if (problem.trim().length === 0) return;
+    if (!problemIsValid || !phoneIsValid || !addressIsValid) return;
     setDialogOpen(true);
   }
 
@@ -28,6 +35,8 @@ export function HomeSamplingForm() {
       `Name: ${patient.name}`,
       `Father/Husband Name: ${patient.guardianName}`,
       `Age: ${patient.age}`,
+      `Phone No: ${phone.trim()}`,
+      `Address: ${address.trim()}`,
       "",
       "*Details*",
       problem.trim(),
@@ -59,8 +68,38 @@ export function HomeSamplingForm() {
           value={problem}
           onChange={(e) => setProblem(e.target.value)}
         />
-        {attempted && summaryText.length === 0 && (
+        {attempted && !problemIsValid && (
           <p className="text-sm text-error">Please describe what you need.</p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="phone">Phone No</Label>
+        <Input
+          id="phone"
+          type="tel"
+          required
+          placeholder="e.g. 0300-1234567"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        {attempted && !phoneIsValid && (
+          <p className="text-sm text-error">Please enter your phone number.</p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="address">Address</Label>
+        <Textarea
+          id="address"
+          required
+          rows={3}
+          placeholder="House #, street, area, city — where should we send the sample collector?"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        {attempted && !addressIsValid && (
+          <p className="text-sm text-error">Please enter your address.</p>
         )}
       </div>
 

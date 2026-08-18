@@ -1,18 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export function GoogleButton() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
     setLoading(true);
+    const callbackURL = redirectTo
+      ? `/auth/redirect?redirect=${encodeURIComponent(redirectTo)}`
+      : "/auth/redirect";
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/auth/redirect",
+      callbackURL,
     });
-    // No need to reset `loading` — a successful call redirects the browser.
   }
 
   return (

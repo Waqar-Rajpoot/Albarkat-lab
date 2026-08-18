@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { GoogleButton } from "@/components/auth/google-button";
 
@@ -24,7 +25,9 @@ export default function SignInPage() {
         </div>
 
         <div className="flex flex-col gap-6 rounded-lg border border-border bg-surface p-6 shadow-sm">
-          <GoogleButton /> 
+          <Suspense fallback={null}>
+            <GoogleButton />
+          </Suspense>
 
           <div className="flex items-center gap-3 text-xs font-medium text-text-secondary">
             <div className="h-px flex-1 bg-border" />
@@ -32,7 +35,9 @@ export default function SignInPage() {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <SignInForm />
+          <Suspense fallback={null}>
+            <SignInForm />
+          </Suspense>
         </div>
 
         <p className="text-center text-sm text-text-secondary">
