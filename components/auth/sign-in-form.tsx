@@ -134,7 +134,7 @@ export function SignInForm() {
         </div>
       )}
 
-      <Button type="submit" variant="success" disabled={loading} className="mt-2">
+      <Button type="submit" variant="default" disabled={loading} className="mt-2">
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
         {loading ? "Signing in..." : "Sign in"}
       </Button>

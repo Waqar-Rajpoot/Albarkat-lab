@@ -212,7 +212,7 @@ export default function AdminXRaysPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" variant="success" disabled={saving}>
+            <Button type="submit" variant="default" disabled={saving}>
               {saving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : editingId ? (
