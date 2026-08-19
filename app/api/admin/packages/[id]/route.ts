@@ -56,7 +56,41 @@ export async function PUT(
     const pkg = await Package.findByIdAndUpdate(
         id,
         { title, description, discountedPrice, originalPrice, includedTests },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
+    );
+
+    if (!pkg) {
+        return NextResponse.json({ error: "Package not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ package: pkg });
+}
+
+export async function PATCH(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const guard = await requireAdmin();
+    if (guard instanceof NextResponse) return guard;
+
+    const { id } = await params;
+    if (!mongoose.isValidObjectId(id)) {
+        return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
+
+    const body = await request.json();
+    if (typeof body.isFeatured !== "boolean") {
+        return NextResponse.json(
+            { error: "isFeatured must be a boolean" },
+            { status: 400 }
+        );
+    }
+
+    await connectToDatabase();
+    const pkg = await Package.findByIdAndUpdate(
+        id,
+        { isFeatured: body.isFeatured },
+        { returnDocument: "after", runValidators: true }
     );
 
     if (!pkg) {

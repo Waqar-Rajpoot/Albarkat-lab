@@ -3,14 +3,67 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { requireAdmin } from "@/lib/require-admin";
 import Package from "@/models/Package";
 
-export async function GET() {
+type PackageFilter = {
+    $or?: Array<
+        | { title: { $regex: string; $options: string } }
+        | { description: { $regex: string; $options: string } }
+        | { includedTests: { $elemMatch: { $regex: string; $options: string } } }
+    >;
+    discountedPrice?: { $gte?: number; $lte?: number };
+};
+
+export async function GET(request: NextRequest) {
     const guard = await requireAdmin();
     if (guard instanceof NextResponse) return guard;
 
-    await connectToDatabase();
-    const packages = await Package.find().sort({ createdAt: -1 });
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+    const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit")) || 9));
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json({ packages });
+    const search = searchParams.get("search")?.trim() ?? "";
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+
+    const filter: PackageFilter = {};
+
+    if (search) {
+        const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        filter.$or = [
+            { title: { $regex: escaped, $options: "i" } },
+            { description: { $regex: escaped, $options: "i" } },
+            { includedTests: { $elemMatch: { $regex: escaped, $options: "i" } } },
+        ];
+    }
+
+    // Price filters apply to the discounted (customer-facing) price.
+    const priceFilter: { $gte?: number; $lte?: number } = {};
+    if (minPrice !== null && minPrice !== "" && Number.isFinite(Number(minPrice))) {
+        priceFilter.$gte = Number(minPrice);
+    }
+    if (maxPrice !== null && maxPrice !== "" && Number.isFinite(Number(maxPrice))) {
+        priceFilter.$lte = Number(maxPrice);
+    }
+    if (Object.keys(priceFilter).length > 0) {
+        filter.discountedPrice = priceFilter;
+    }
+
+    await connectToDatabase();
+
+    const [packages, total] = await Promise.all([
+        Package.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Package.countDocuments(filter),
+    ]);
+
+    return NextResponse.json({
+        packages,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
+        },
+    });
 }
 
 export async function POST(request: NextRequest) {

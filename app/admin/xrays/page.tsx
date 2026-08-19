@@ -30,6 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ListFilters } from "@/components/admin/list-filters";
+import { PaginationControls, type Pagination } from "@/components/admin/pagination-controls";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type XRay = {
   _id: string;
@@ -39,6 +42,8 @@ type XRay = {
 };
 
 const emptyForm = { category: "", procedure: "", price: "" };
+
+const PAGE_SIZE = 10;
 
 const priceFormatter = new Intl.NumberFormat("en-PK", {
   style: "currency",
@@ -53,8 +58,18 @@ function formatPrice(price: number) {
 
 export default function AdminXRaysPage() {
   const [xrays, setXrays] = useState<XRay[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
+  const debouncedMinPrice = useDebouncedValue(minPrice);
+  const debouncedMaxPrice = useDebouncedValue(maxPrice);
+  const hasActiveFilters = Boolean(search || minPrice || maxPrice);
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,14 +78,23 @@ export default function AdminXRaysPage() {
   const [deleteTarget, setDeleteTarget] = useState<XRay | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  async function loadXrays() {
+  async function loadXrays(targetPage: number) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/xrays");
+      const params = new URLSearchParams({
+        page: String(targetPage),
+        limit: String(PAGE_SIZE),
+      });
+      if (debouncedSearch) params.set("search", debouncedSearch);
+      if (debouncedMinPrice) params.set("minPrice", debouncedMinPrice);
+      if (debouncedMaxPrice) params.set("maxPrice", debouncedMaxPrice);
+
+      const res = await fetch(`/api/admin/xrays?${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load X-rays");
       setXrays(data.xrays);
+      setPagination(data.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load X-rays");
     } finally {
@@ -78,10 +102,23 @@ export default function AdminXRaysPage() {
     }
   }
 
+  // Reset to page 1 whenever the filters change.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadXrays();
-  }, []);
+    setPage(1);
+  }, [debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadXrays(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  function clearFilters() {
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
+  }
 
   function startEdit(xray: XRay) {
     setEditingId(xray._id);
@@ -119,7 +156,8 @@ export default function AdminXRaysPage() {
       if (!res.ok) throw new Error(data.error ?? "Failed to save");
 
       cancelEdit();
-      await loadXrays();
+      await loadXrays(editingId ? page : 1);
+      if (!editingId) setPage(1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
@@ -138,8 +176,14 @@ export default function AdminXRaysPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to delete");
 
-      setXrays((prev) => prev.filter((x) => x._id !== id));
       if (editingId === id) cancelEdit();
+
+      const isLastRowOnPage = xrays.length === 1 && page > 1;
+      if (isLastRowOnPage) {
+        setPage((p) => p - 1);
+      } else {
+        await loadXrays(page);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
     } finally {
@@ -160,6 +204,7 @@ export default function AdminXRaysPage() {
               <h1 className="text-xl font-semibold text-text">X-Ray Procedures</h1>
               <p className="text-sm text-text-secondary">
                 Manage the X-ray procedures patients can be booked for.
+                {pagination ? ` ${pagination.total} total.` : ""}
               </p>
             </div>
           </div>
@@ -237,6 +282,18 @@ export default function AdminXRaysPage() {
           </p>
         )}
 
+        <ListFilters
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by category or procedure..."
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          onClear={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+
         <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
           <Table>
             <TableHeader>
@@ -257,7 +314,9 @@ export default function AdminXRaysPage() {
               ) : xrays.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
-                    No X-ray procedures yet. Add your first one above.
+                    {hasActiveFilters
+                      ? "No X-ray procedures match your filters."
+                      : "No X-ray procedures yet. Add your first one above."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -299,6 +358,12 @@ export default function AdminXRaysPage() {
               )}
             </TableBody>
           </Table>
+
+          <PaginationControls
+            pagination={pagination}
+            loading={loading}
+            onPageChange={setPage}
+          />
         </div>
       </div>
 

@@ -30,6 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ListFilters } from "@/components/admin/list-filters";
+import { PaginationControls, type Pagination } from "@/components/admin/pagination-controls";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type Test = {
   _id: string;
@@ -39,6 +42,8 @@ type Test = {
 };
 
 const emptyForm = { testId: "", description: "", price: "" };
+
+const PAGE_SIZE = 10;
 
 const priceFormatter = new Intl.NumberFormat("en-PK", {
   style: "currency",
@@ -53,8 +58,18 @@ function formatPrice(price: number) {
 
 export default function AdminTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
+  const debouncedMinPrice = useDebouncedValue(minPrice);
+  const debouncedMaxPrice = useDebouncedValue(maxPrice);
+  const hasActiveFilters = Boolean(search || minPrice || maxPrice);
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,14 +78,23 @@ export default function AdminTestsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Test | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  async function loadTests() {
+  async function loadTests(targetPage: number) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/tests");
+      const params = new URLSearchParams({
+        page: String(targetPage),
+        limit: String(PAGE_SIZE),
+      });
+      if (debouncedSearch) params.set("search", debouncedSearch);
+      if (debouncedMinPrice) params.set("minPrice", debouncedMinPrice);
+      if (debouncedMaxPrice) params.set("maxPrice", debouncedMaxPrice);
+
+      const res = await fetch(`/api/admin/tests?${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load tests");
       setTests(data.tests);
+      setPagination(data.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load tests");
     } finally {
@@ -78,10 +102,23 @@ export default function AdminTestsPage() {
     }
   }
 
+  // Reset to page 1 whenever the filters change.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadTests();
-  }, []);
+    setPage(1);
+  }, [debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadTests(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  function clearFilters() {
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
+  }
 
   function startEdit(test: Test) {
     setEditingId(test._id);
@@ -119,7 +156,8 @@ export default function AdminTestsPage() {
       if (!res.ok) throw new Error(data.error ?? "Failed to save");
 
       cancelEdit();
-      await loadTests();
+      await loadTests(editingId ? page : 1);
+      if (!editingId) setPage(1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
@@ -138,8 +176,16 @@ export default function AdminTestsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to delete");
 
-      setTests((prev) => prev.filter((t) => t._id !== id));
       if (editingId === id) cancelEdit();
+
+      // If this was the last row on a page beyond the first, step back a
+      // page and let the effect re-fetch — otherwise just refresh in place.
+      const isLastRowOnPage = tests.length === 1 && page > 1;
+      if (isLastRowOnPage) {
+        setPage((p) => p - 1);
+      } else {
+        await loadTests(page);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
     } finally {
@@ -160,6 +206,7 @@ export default function AdminTestsPage() {
               <h1 className="text-xl font-semibold text-text">Lab Tests</h1>
               <p className="text-sm text-text-secondary">
                 Manage the tests patients can be booked for.
+                {pagination ? ` ${pagination.total} total.` : ""}
               </p>
             </div>
           </div>
@@ -237,6 +284,18 @@ export default function AdminTestsPage() {
           </p>
         )}
 
+        <ListFilters
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by description or test ID..."
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          onClear={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+
         <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
           <Table>
             <TableHeader>
@@ -257,7 +316,9 @@ export default function AdminTestsPage() {
               ) : tests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-10 text-center text-text-secondary">
-                    No tests yet. Add your first one above.
+                    {hasActiveFilters
+                      ? "No tests match your filters."
+                      : "No tests yet. Add your first one above."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -299,6 +360,12 @@ export default function AdminTestsPage() {
               )}
             </TableBody>
           </Table>
+
+          <PaginationControls
+            pagination={pagination}
+            loading={loading}
+            onPageChange={setPage}
+          />
         </div>
       </div>
 

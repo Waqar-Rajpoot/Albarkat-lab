@@ -39,6 +39,7 @@ export default async function BookPackagePage() {
       icon={PackageIcon}
       title="Book a Health Package"
       subtitle="Choose the health package that fits you, share your details, and we'll confirm your booking over WhatsApp."
+      maxWidth="max-w-5xl"
     >
       <PackageBookingForm packages={packages} />
     </BookingPageShell>

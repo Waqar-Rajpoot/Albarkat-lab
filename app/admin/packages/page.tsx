@@ -6,6 +6,7 @@ import {
   Package as PackageIcon,
   Pencil,
   Plus,
+  Star,
   Trash2,
   X,
 } from "lucide-react";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +25,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ListFilters } from "@/components/admin/list-filters";
+import { PaginationControls, type Pagination } from "@/components/admin/pagination-controls";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type Package = {
   _id: string;
@@ -31,6 +36,7 @@ type Package = {
   discountedPrice: number;
   originalPrice: number;
   includedTests: string[];
+  isFeatured: boolean;
 };
 
 type FormState = {
@@ -49,6 +55,8 @@ const emptyForm: FormState = {
   includedTests: [""],
 };
 
+const PAGE_SIZE = 9;
+
 const priceFormatter = new Intl.NumberFormat("en-PK", {
   maximumFractionDigits: 0,
 });
@@ -60,8 +68,18 @@ function formatPrice(price: number) {
 
 export default function AdminPackagesPage() {
   const [packages, setPackages] = useState<Package[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
+  const debouncedMinPrice = useDebouncedValue(minPrice);
+  const debouncedMaxPrice = useDebouncedValue(maxPrice);
+  const hasActiveFilters = Boolean(search || minPrice || maxPrice);
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -69,15 +87,25 @@ export default function AdminPackagesPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<Package | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  async function loadPackages() {
+  async function loadPackages(targetPage: number) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/packages");
+      const params = new URLSearchParams({
+        page: String(targetPage),
+        limit: String(PAGE_SIZE),
+      });
+      if (debouncedSearch) params.set("search", debouncedSearch);
+      if (debouncedMinPrice) params.set("minPrice", debouncedMinPrice);
+      if (debouncedMaxPrice) params.set("maxPrice", debouncedMaxPrice);
+
+      const res = await fetch(`/api/admin/packages?${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load packages");
       setPackages(data.packages);
+      setPagination(data.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load packages");
     } finally {
@@ -85,12 +113,23 @@ export default function AdminPackagesPage() {
     }
   }
 
+  // Reset to page 1 whenever the filters change.
   useEffect(() => {
-    // Standard fetch-on-mount pattern; loadPackages manages its own
-    // loading/error state internally.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadPackages();
-  }, []);
+    setPage(1);
+  }, [debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadPackages(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, debouncedSearch, debouncedMinPrice, debouncedMaxPrice]);
+
+  function clearFilters() {
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
+  }
 
   function startEdit(pkg: Package) {
     setEditingId(pkg._id);
@@ -153,11 +192,47 @@ export default function AdminPackagesPage() {
       if (!res.ok) throw new Error(data.error ?? "Failed to save");
 
       cancelEdit();
-      await loadPackages();
+      await loadPackages(editingId ? page : 1);
+      if (!editingId) setPage(1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleFeatured(pkg: Package) {
+    const nextValue = !pkg.isFeatured;
+    setTogglingId(pkg._id);
+    setError(null);
+
+    // Optimistically flip the badge, then reconcile with the server response.
+    setPackages((prev) =>
+      prev.map((p) => (p._id === pkg._id ? { ...p, isFeatured: nextValue } : p))
+    );
+
+    try {
+      const res = await fetch(`/api/admin/packages/${pkg._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured: nextValue }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to update featured status");
+
+      setPackages((prev) =>
+        prev.map((p) => (p._id === pkg._id ? { ...p, isFeatured: data.package.isFeatured } : p))
+      );
+    } catch (err) {
+      // Roll back the optimistic update on failure.
+      setPackages((prev) =>
+        prev.map((p) => (p._id === pkg._id ? { ...p, isFeatured: pkg.isFeatured } : p))
+      );
+      setError(
+        err instanceof Error ? err.message : "Failed to update featured status"
+      );
+    } finally {
+      setTogglingId(null);
     }
   }
 
@@ -172,8 +247,14 @@ export default function AdminPackagesPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to delete");
 
-      setPackages((prev) => prev.filter((p) => p._id !== id));
       if (editingId === id) cancelEdit();
+
+      const isLastRowOnPage = packages.length === 1 && page > 1;
+      if (isLastRowOnPage) {
+        setPage((p) => p - 1);
+      } else {
+        await loadPackages(page);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
     } finally {
@@ -193,6 +274,7 @@ export default function AdminPackagesPage() {
             <h1 className="text-xl font-semibold text-text">Health Packages</h1>
             <p className="text-sm text-text-secondary">
               Manage discounted test bundles shown to patients.
+              {pagination ? ` ${pagination.total} total.` : ""}
             </p>
           </div>
         </div>
@@ -321,25 +403,74 @@ export default function AdminPackagesPage() {
           </p>
         )}
 
-        <div>
+        <ListFilters
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by title, description, or included test..."
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          onClear={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-4 shadow-sm">
           {loading ? (
             <div className="flex justify-center py-10 text-text-secondary">
               <Loader2 className="h-5 w-5 animate-spin" />
             </div>
           ) : packages.length === 0 ? (
-            <div className="rounded-lg border border-border bg-surface py-10 text-center text-text-secondary shadow-sm">
-              No packages yet. Add your first one above.
+            <div className="py-10 text-center text-text-secondary">
+              {hasActiveFilters
+                ? "No packages match your filters."
+                : "No packages yet. Add your first one above."}
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {packages.map((pkg) => (
                 <div
                   key={pkg._id}
-                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-5 shadow-sm"
+                  className={cn(
+                    "flex flex-col gap-3 rounded-lg border p-5",
+                    pkg.isFeatured
+                      ? "border-primary/40 bg-primary/5"
+                      : "border-border bg-background"
+                  )}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-text">{pkg.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-text">{pkg.title}</h3>
+                      {pkg.isFeatured && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-white">
+                          <Star className="h-3 w-3 fill-current" />
+                          Featured
+                        </span>
+                      )}
+                    </div>
                     <div className="flex shrink-0 gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleFeatured(pkg)}
+                        disabled={togglingId === pkg._id}
+                        className={cn(
+                          pkg.isFeatured && "text-primary hover:text-primary"
+                        )}
+                        aria-label={
+                          pkg.isFeatured
+                            ? `Unfeature ${pkg.title}`
+                            : `Feature ${pkg.title}`
+                        }
+                      >
+                        {togglingId === pkg._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Star
+                            className={cn("h-4 w-4", pkg.isFeatured && "fill-current")}
+                          />
+                        )}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -390,6 +521,12 @@ export default function AdminPackagesPage() {
               ))}
             </div>
           )}
+
+          <PaginationControls
+            pagination={pagination}
+            loading={loading}
+            onPageChange={setPage}
+          />
         </div>
       </div>
 

@@ -25,8 +25,8 @@ const links = [
   { href: "/about", label: "About Us", icon: Info, exact: true },
   { href: "/book-test", label: "Test", icon: FlaskConical },
   { href: "/book-xray", label: "X-Ray", icon: Bone },
-  { href: "/book-package", label: "Package", icon: Package },
   { href: "/home-sampling", label: "Home Sampling", icon: Syringe },
+  { href: "/book-package", label: "Package", icon: Package },
 ];
 
 function getInitials(name?: string | null, email?: string | null) {

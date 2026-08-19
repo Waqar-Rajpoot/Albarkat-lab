@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   BadgeCheck,
+  Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -30,7 +32,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/auth-client";
+
+type Role = "user" | "admin";
+const ROLES: Role[] = ["user", "admin"];
 
 type User = {
   _id: string;
@@ -73,6 +85,9 @@ function getInitials(name?: string | null, email?: string | null) {
 const PAGE_SIZE = 10;
 
 export default function AdminUsersPage() {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
+
   const [users, setUsers] = useState<User[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [page, setPage] = useState(1);
@@ -81,6 +96,7 @@ export default function AdminUsersPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
 
   async function loadUsers(targetPage: number) {
     setLoading(true);
@@ -132,6 +148,27 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function handleRoleChange(user: User, nextRole: Role) {
+    if (user.role === nextRole) return;
+
+    setUpdatingRoleId(user._id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/users/${user._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: nextRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to update role");
+      await loadUsers(page);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update role");
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  }
+
   const totalPages = pagination?.totalPages ?? 1;
 
   return (
@@ -162,7 +199,7 @@ export default function AdminUsersPage() {
               <TableRow>
                 <TableHead>User</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead className="w-28">Role</TableHead>
+                <TableHead className="w-36">Role</TableHead>
                 <TableHead className="w-32">Joined</TableHead>
                 <TableHead className="w-16 text-right">Actions</TableHead>
               </TableRow>
@@ -181,73 +218,119 @@ export default function AdminUsersPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2.5">
-                        {user.image ? (
-                          <Image
-                            src={user.image}
-                            alt={user.name}
-                            width={32}
-                            height={32}
-                            className="rounded-full"
-                          />
-                        ) : (
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                            {getInitials(user.name, user.email)}
-                          </span>
-                        )}
-                        <span className="font-medium text-text">{user.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5 text-text-secondary">
-                        {user.email}
-                        {user.emailVerified && (
-                          <BadgeCheck
-                            className="h-4 w-4 shrink-0 text-success"
-                            aria-label="Email verified"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-                          user.role === "admin"
-                            ? "bg-accent-blue-light text-secondary"
-                            : "bg-background-light text-text-secondary"
-                        )}
-                      >
-                        {user.role === "admin" && <ShieldCheck className="h-3 w-3" />}
-                        {user.role}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-text-secondary">
-                      {formatDate(user.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-error hover:bg-error-light hover:text-error"
-                          onClick={() => setDeleteTarget(user)}
-                          disabled={deletingId === user._id}
-                          aria-label={`Delete ${user.name}`}
-                        >
-                          {deletingId === user._id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                users.map((user) => {
+                  const isSelf = user._id === currentUserId;
+                  const isUpdating = updatingRoleId === user._id;
+
+                  return (
+                    <TableRow key={user._id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2.5">
+                          {user.image ? (
+                            <Image
+                              src={user.image}
+                              alt={user.name}
+                              width={32}
+                              height={32}
+                              className="rounded-full"
+                            />
                           ) : (
-                            <Trash2 className="h-4 w-4" />
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                              {getInitials(user.name, user.email)}
+                            </span>
                           )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                          <span className="font-medium text-text">{user.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 text-text-secondary">
+                          {user.email}
+                          {user.emailVerified && (
+                            <BadgeCheck
+                              className="h-4 w-4 shrink-0 text-success"
+                              aria-label="Email verified"
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {/* Single source of truth for role: the badge IS the
+                            control. No separate role display + separate
+                            action elsewhere — this dropdown trigger is
+                            styled directly (not wrapping a <Button>) so we
+                            never nest two real <button> elements, which is
+                            invalid HTML and breaks hydration. */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            disabled={isUpdating || isSelf}
+                            title={
+                              isSelf
+                                ? "You can't change your own role"
+                                : "Click to change role"
+                            }
+                            className={cn(
+                              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors",
+                              "disabled:cursor-not-allowed disabled:opacity-60",
+                              user.role === "admin"
+                                ? "bg-accent-blue-light text-secondary"
+                                : "bg-background-light text-text-secondary",
+                              !isSelf && "hover:opacity-80"
+                            )}
+                          >
+                            {isUpdating ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              user.role === "admin" && (
+                                <ShieldCheck className="h-3 w-3" />
+                              )
+                            )}
+                            <span className="capitalize">{user.role}</span>
+                            {!isSelf && <ChevronDown className="h-3 w-3 opacity-60" />}
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <div className="px-2 py-1.5 text-xs font-medium text-text-secondary">
+                              Change role
+                            </div>
+                            {ROLES.map((role) => (
+                              <DropdownMenuItem
+                                key={role}
+                                className="capitalize"
+                                onClick={() => handleRoleChange(user, role)}
+                                disabled={user.role === role}
+                              >
+                                {user.role === role && (
+                                  <Check className="h-3.5 w-3.5" />
+                                )}
+                                {role}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                      <TableCell className="text-text-secondary">
+                        {formatDate(user.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-error hover:bg-error-light hover:text-error"
+                            onClick={() => setDeleteTarget(user)}
+                            disabled={deletingId === user._id}
+                            aria-label={`Delete ${user.name}`}
+                          >
+                            {deletingId === user._id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

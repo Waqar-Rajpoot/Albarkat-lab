@@ -55,8 +55,8 @@ const quickLinks = [
 const services = [
   { href: "/book-test", label: "Lab Tests" },
   { href: "/book-xray", label: "X-Ray Imaging" },
-  { href: "/book-package", label: "Health Packages" },
   { href: "/home-sampling", label: "Home Sampling" },
+  { href: "/book-package", label: "Health Packages" },
 ];
 
 const socialLinks = [
