@@ -178,7 +178,7 @@ export default function Footer() {
                   href="tel:+923360069828"
                   className="text-sm text-white/70 transition-colors hover:text-white"
                 >
-                  +92336-0069828
+                  0342-8312028
                 </a>
               </li>
               <li className="flex items-center gap-2.5">

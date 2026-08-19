@@ -1,4 +1,4 @@
-const DEFAULT_WHATSAPP_NUMBER = "923206913949";
+const DEFAULT_WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || "923356622028";
 
 export function buildWhatsAppLink(message: string): string {
   const configured = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
