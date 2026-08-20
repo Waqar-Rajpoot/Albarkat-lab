@@ -4,7 +4,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import PackageModel from "@/models/Package";
 import { WhyChooseUsCarousel } from "@/components/why-choose-us-carousel";
 import { PackagesCarousel, type HealthPackage } from "@/components/packages-carousel";
-
+import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 async function getFeaturedPackages(): Promise<HealthPackage[]> {
@@ -30,34 +30,44 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="bg-background px-4 py-20 sm:py-28">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-          <span className="rounded-full border border-border bg-surface px-4 py-1 text-xs font-medium text-text-secondary">
-            Trusted Diagnostics, Close to Home
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight text-text sm:text-5xl">
-            Your Health, <span className="text-primary">Accurately Measured</span>
-          </h1>
-          <p className="max-w-xl text-base text-text-secondary sm:text-lg">
-            AL-Barkat Lab brings you reliable lab tests, X-ray imaging, and complete
-            health checkup packages — with fast results you can trust.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/book-test"
-              className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-            >
-              Book a Test
-            </Link>
-            <Link
-              href="/book-package"
-              className="rounded-md border border-border bg-surface px-6 py-2.5 text-sm font-medium text-text transition-colors hover:bg-background-light"
-            >
-              View Health Packages
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero */}
+<section className="relative overflow-hidden px-4 py-20 sm:py-28">
+  <Image
+    src="/hero-bg.jpg"
+    alt=""
+    fill
+    priority
+    className="object-cover"
+  />
+  <div className="absolute inset-0 bg-black/55" />
+
+  <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+    <span className="rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-medium text-white backdrop-blur-sm">
+      Trusted Diagnostics, Close to Home
+    </span>
+    <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+      Your Health, <span className="text-blue-500">Accurately Measured</span>
+    </h1>
+    <p className="max-w-xl text-base text-white/85 sm:text-lg">
+      AL-Barkat Lab brings you reliable lab tests, X-ray imaging, and complete
+      health checkup packages — with fast results you can trust.
+    </p>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Link
+        href="/book-test"
+        className="rounded-md bg-blue-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+      >
+        Book a Test
+      </Link>
+      <Link
+        href="/book-package"
+        className="rounded-md border border-white/40 bg-white/10 px-6 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+      >
+        View Health Packages
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* About / explain the lab */}
       <section className="border-t border-border bg-surface px-4 py-16">
