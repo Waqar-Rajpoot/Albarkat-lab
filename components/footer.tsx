@@ -50,6 +50,7 @@ const quickLinks = [
   { href: "/book-test", label: "Book a Test" },
   { href: "/book-xray", label: "Book an X-Ray" },
   { href: "/book-package", label: "Book a Package" },
+  { href: "/online-report", label: "Request Online Report" },
 ];
 
 const services = [
@@ -193,9 +194,7 @@ export default function Footer() {
               <li className="flex items-start gap-2.5">
                 <Clock className="mt-0.5 h-4 w-4 shrink-0 text-white" />
                 <span className="text-sm text-white/70">
-                  Mon &ndash; Sat: 8:00 AM &ndash; 10:00 PM
-                  <br />
-                  Sunday: 9:00 AM &ndash; 5:00 PM
+                  24/7 Service &amp; Support
                 </span>
               </li>
             </ul>
