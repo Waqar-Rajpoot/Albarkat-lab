@@ -27,6 +27,7 @@ const links = [
   { href: "/book-xray", label: "X-Ray", icon: Bone },
   { href: "/home-sampling", label: "Home Sampling", icon: Syringe },
   { href: "/book-package", label: "Package", icon: Package },
+  { href: "/online-report", label: "Online Report", icon: Package },
 ];
 
 function getInitials(name?: string | null, email?: string | null) {
@@ -76,7 +77,7 @@ export function PublicNavbar() {
 
         {/* Center: links (desktop only) */}
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
-          {links.map(({ href, label, icon: Icon, exact }) => {
+          {links.map(({ href, label, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href);
 
             return (
@@ -84,13 +85,12 @@ export function PublicNavbar() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-bold transition-colors",
                   isActive
                     ? "bg-primary text-white"
-                    : "text-text-secondary hover:bg-background-light hover:text-text"
+                    : "text-black hover:bg-background-light hover:text-text"
                 )}
               >
-                <Icon className="h-4 w-4" />
                 {label}
               </Link>
             );

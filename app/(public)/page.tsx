@@ -29,15 +29,13 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* Hero */}
-      {/* Hero */}
 <section className="relative overflow-hidden px-4 py-20 sm:py-28">
   <Image
-    src="/hero-bg.jpg"
+    src="/hero-bg1.jpeg"
     alt=""
     fill
     priority
-    className="object-cover"
+    className="object-cover backdrop-opacity-60"
   />
   <div className="absolute inset-0 bg-black/55" />
 
