@@ -1,0 +1,298 @@
+[
+  {
+    "_id": {
+      "$oid": "a44110bc60469ba1a3ee3adf"
+    },
+    "title": "Diabetes Screening Package",
+    "description": "Comprehensive panel to screen for and monitor diabetes and blood sugar control.",
+    "discountedPrice": {
+      "$numberInt": "3500"
+    },
+    "originalPrice": {
+      "$numberInt": "5000"
+    },
+    "includedTests": [
+      "Sugar Fasting",
+      "Sugar Random",
+      "HbA1C (Glycosylated Haemoglobin)",
+      "Urine Complete Examination"
+    ],
+    "isFeatured": true,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "31866f7349ecf619b8980a49"
+    },
+    "title": "Cardiac Risk Package",
+    "description": "Assesses heart health and cardiovascular risk factors.",
+    "discountedPrice": {
+      "$numberInt": "8000"
+    },
+    "originalPrice": {
+      "$numberInt": "11000"
+    },
+    "includedTests": [
+      "Lipid Profile",
+      "Troponin-I",
+      "CPK",
+      "Cardiac Enzymes (CPK,CKMB,SGOT,LDH)",
+      "ECG"
+    ],
+    "isFeatured": true,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "31bdc5e2108670cfdf618160"
+    },
+    "title": "Liver Function Package",
+    "description": "Evaluates liver health, enzyme levels, and bilirubin metabolism.",
+    "discountedPrice": {
+      "$numberInt": "2500"
+    },
+    "originalPrice": {
+      "$numberInt": "3500"
+    },
+    "includedTests": [
+      "LFT-Liver Functions Tests",
+      "SGOT (AST)",
+      "SGPT (ALT)",
+      "Bilirubin Total"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "607a88e994d47c8603acbf83"
+    },
+    "title": "Kidney Function Package",
+    "description": "Checks kidney function and electrolyte balance.",
+    "discountedPrice": {
+      "$numberInt": "2200"
+    },
+    "originalPrice": {
+      "$numberInt": "3000"
+    },
+    "includedTests": [
+      "RFT-Renal Function Tests",
+      "Urea",
+      "Creatinine",
+      "Uric Acid",
+      "Serum Electrolytes (Na,K,Cl,HCO3)"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "825eabec6ee3a3ae942b6c81"
+    },
+    "title": "Thyroid Profile Package",
+    "description": "Full thyroid hormone panel for detecting thyroid disorders.",
+    "discountedPrice": {
+      "$numberInt": "3000"
+    },
+    "originalPrice": {
+      "$numberInt": "4200"
+    },
+    "includedTests": [
+      "T3, T4, TSH",
+      "TSH (Thyroid Stimulating Hormone)",
+      "T4 (Free)",
+      "T3 (Tri-Iodothyronine)"
+    ],
+    "isFeatured": true,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "9799df240c0f28cb46a9729f"
+    },
+    "title": "Full Body Checkup",
+    "description": "Broad health screening covering blood, sugar, liver, kidney, and lipid status.",
+    "discountedPrice": {
+      "$numberInt": "12000"
+    },
+    "originalPrice": {
+      "$numberInt": "16000"
+    },
+    "includedTests": [
+      "CBC-Blood Complete Examination",
+      "LFT-Liver Functions Tests",
+      "RFT-Renal Function Tests",
+      "Lipid Profile",
+      "Sugar Fasting",
+      "Urine Complete Examination",
+      "Chest X-Ray (PA View)"
+    ],
+    "isFeatured": true,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "1dbec3fbc8cbc378895a188f"
+    },
+    "title": "Anemia Panel",
+    "description": "Identifies anemia type and severity through blood cell and iron studies.",
+    "discountedPrice": {
+      "$numberInt": "2800"
+    },
+    "originalPrice": {
+      "$numberInt": "4000"
+    },
+    "includedTests": [
+      "CBC-Blood Complete Examination",
+      "Iron (Fe)",
+      "TIBC (Total Iron Binding Capacity)",
+      "Ferritin",
+      "Retics Count (Reticulocyte)"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "09f3c1b89051ea4d5fc928d4"
+    },
+    "title": "Hepatitis Screening Package",
+    "description": "Screens for Hepatitis B and C infection.",
+    "discountedPrice": {
+      "$numberInt": "2000"
+    },
+    "originalPrice": {
+      "$numberInt": "2800"
+    },
+    "includedTests": [
+      "HBsAg (Screening)",
+      "Anti HCV (Screening)"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "ff072741370c26e6f0c2e54c"
+    },
+    "title": "Bone & Joint Health Package",
+    "description": "Assesses bone metabolism and joint-related markers.",
+    "discountedPrice": {
+      "$numberInt": "4500"
+    },
+    "originalPrice": {
+      "$numberInt": "6000"
+    },
+    "includedTests": [
+      "Calcium",
+      "Phosphorous (Phosphate) (PO4)",
+      "Alkaline Phosphate",
+      "RA Factor",
+      "Knee Joint (AP, Lateral & Skyline)"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c28847fc9e8e561dc3fcac0e"
+    },
+    "title": "Fertility Hormone Package",
+    "description": "Evaluates reproductive hormone levels for fertility assessment.",
+    "discountedPrice": {
+      "$numberInt": "6500"
+    },
+    "originalPrice": {
+      "$numberInt": "9000"
+    },
+    "includedTests": [
+      "FSH (Follicle Stimulating Hormone)",
+      "LH (Luteinizing Hormone)",
+      "Prolactin",
+      "Progesterone",
+      "Testosterone"
+    ],
+    "isFeatured": false,
+    "createdAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-21T04:56:35.367Z"
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  }
+]
