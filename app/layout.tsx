@@ -13,10 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://albarkatlab.com"; // TODO: replace with your real domain
+const siteUrl = "https://albarkatlab.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: siteUrl,
+  },
+  verification: {
+    google: "Ti8dWqvcdXbz5Qpl8-uOCSEqkORS5QB6thFC82S9Zp0",
+  },
   title: {
     default: "AL-Barkat Lab | Diagnostic Lab Tests, X-Rays & Health Packages",
     template: "%s | AL-Barkat Lab",
